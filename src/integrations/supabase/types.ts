@@ -41,42 +41,78 @@ export type Database = {
       requests: {
         Row: {
           apolice_url: string | null
+          bairro: string | null
           categoria: string
+          cep: string | null
+          cidade: string | null
           comissao_imob: number
+          complemento: string | null
           contrato_url: string | null
+          cpf_cnpj: string | null
           created_at: string
+          email_contato: string | null
           id: string
           imobiliaria_id: string
+          nome: string | null
+          numero: string | null
           premio_total: number
+          rua: string | null
           status: string
+          telefone: string | null
+          telefone2: string | null
+          uf: string | null
           updated_at: string
           valor_imovel: number
           valor_liquido: number
         }
         Insert: {
           apolice_url?: string | null
+          bairro?: string | null
           categoria: string
+          cep?: string | null
+          cidade?: string | null
           comissao_imob: number
+          complemento?: string | null
           contrato_url?: string | null
+          cpf_cnpj?: string | null
           created_at?: string
+          email_contato?: string | null
           id?: string
           imobiliaria_id: string
+          nome?: string | null
+          numero?: string | null
           premio_total: number
+          rua?: string | null
           status?: string
+          telefone?: string | null
+          telefone2?: string | null
+          uf?: string | null
           updated_at?: string
           valor_imovel: number
           valor_liquido: number
         }
         Update: {
           apolice_url?: string | null
+          bairro?: string | null
           categoria?: string
+          cep?: string | null
+          cidade?: string | null
           comissao_imob?: number
+          complemento?: string | null
           contrato_url?: string | null
+          cpf_cnpj?: string | null
           created_at?: string
+          email_contato?: string | null
           id?: string
           imobiliaria_id?: string
+          nome?: string | null
+          numero?: string | null
           premio_total?: number
+          rua?: string | null
           status?: string
+          telefone?: string | null
+          telefone2?: string | null
+          uf?: string | null
           updated_at?: string
           valor_imovel?: number
           valor_liquido?: number
