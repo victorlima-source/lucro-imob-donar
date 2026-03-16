@@ -39,7 +39,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <div className="flex-1 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -48,41 +48,39 @@ export default function Auth() {
           className="w-full max-w-md"
         >
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10 mb-4">
-              <Shield className="w-8 h-8 text-primary" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-primary mb-4">
+              <Shield className="w-8 h-8 text-primary-foreground" />
             </div>
             <h1 className="text-3xl font-bold font-display tracking-tight">Imob Lucro</h1>
             <p className="text-sm text-muted-foreground mt-1">By Donar Corretora</p>
           </div>
 
-          <div className="rounded-xl bg-card p-8 gold-border-top">
+          <div className="rounded-xl bg-card p-8 card-shadow border border-border">
             <h2 className="text-lg font-semibold mb-6">{isLogin ? 'Entrar' : 'Criar Conta'}</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <>
                   <div>
                     <Label className="text-sm text-muted-foreground">Nome Completo</Label>
-                    <Input value={fullName} onChange={e => setFullName(e.target.value)} required className="mt-1 bg-muted border-2 border-transparent focus:border-primary transition-all" />
+                    <Input value={fullName} onChange={e => setFullName(e.target.value)} required className="mt-1" />
                   </div>
                   <div>
                     <Label className="text-sm text-muted-foreground">Nome da Imobiliária</Label>
-                    <Input value={companyName} onChange={e => setCompanyName(e.target.value)} required className="mt-1 bg-muted border-2 border-transparent focus:border-primary transition-all" />
+                    <Input value={companyName} onChange={e => setCompanyName(e.target.value)} required className="mt-1" />
                   </div>
                 </>
               )}
               <div>
                 <Label className="text-sm text-muted-foreground">E-mail</Label>
-                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1 bg-muted border-2 border-transparent focus:border-primary transition-all" />
+                <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="mt-1" />
               </div>
               <div>
                 <Label className="text-sm text-muted-foreground">Senha</Label>
-                <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="mt-1 bg-muted border-2 border-transparent focus:border-primary transition-all" />
+                <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} className="mt-1" />
               </div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button type="submit" className="w-full h-12 text-base font-semibold gold-glow" disabled={loading}>
-                  {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar Conta'}
-                </Button>
-              </motion.div>
+              <Button type="submit" className="w-full h-12 text-base font-semibold navy-shadow" disabled={loading}>
+                {loading ? 'Carregando...' : isLogin ? 'Entrar' : 'Criar Conta'}
+              </Button>
             </form>
             <button
               onClick={() => setIsLogin(!isLogin)}
