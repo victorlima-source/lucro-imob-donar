@@ -11,18 +11,18 @@ interface StatCardProps {
 export default function StatCard({ title, value, icon, highlight }: StatCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
-      className={`rounded-xl p-8 gold-border-top ${
-        highlight ? 'bg-card' : 'bg-card'
-      }`}
+      className="rounded-xl p-6 bg-card card-shadow border border-border"
     >
-      <div className="flex items-center gap-3 mb-4">
-        <div className="text-primary">{icon}</div>
-        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">{title}</p>
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${highlight ? 'bg-accent/10 text-accent' : 'bg-primary/10 text-primary'}`}>
+          {icon}
+        </div>
+        <p className="text-sm text-muted-foreground font-medium">{title}</p>
       </div>
-      <p className={`text-4xl font-bold tabular-nums ${highlight ? 'text-primary' : 'text-foreground'}`}>
+      <p className={`text-3xl font-bold tabular-nums ${highlight ? 'text-accent' : 'text-foreground'}`}>
         {formatCurrency(value)}
       </p>
     </motion.div>

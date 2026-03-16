@@ -6,46 +6,46 @@
 
 @layer base {
   :root {
-    --background: 216 78% 7%;
-    --foreground: 210 40% 98%;
+    --background: 210 20% 98%;
+    --foreground: 216 78% 15%;
 
-    --card: 216 65% 15%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 216 78% 15%;
 
-    --popover: 216 65% 15%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 216 78% 15%;
 
-    --primary: 44 80% 51%;
-    --primary-foreground: 216 65% 15%;
+    --primary: 216 78% 15%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 216 65% 15%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 15% 93%;
+    --secondary-foreground: 216 78% 15%;
 
-    --muted: 216 50% 20%;
-    --muted-foreground: 215 25% 63%;
+    --muted: 210 15% 93%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 220 67% 33%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 44 80% 51%;
+    --accent-foreground: 216 78% 15%;
 
-    --destructive: 0 55% 45%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 44 80% 51% / 0.2;
-    --input: 216 50% 20%;
-    --ring: 44 80% 51%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 216 78% 15%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --surface: 216 65% 15%;
-    --surface-elevated: 216 55% 20%;
+    --surface: 210 15% 96%;
+    --surface-elevated: 210 15% 93%;
 
-    --sidebar-background: 216 65% 15%;
-    --sidebar-foreground: 210 40% 98%;
+    --sidebar-background: 216 78% 15%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 44 80% 51%;
-    --sidebar-primary-foreground: 216 65% 15%;
+    --sidebar-primary-foreground: 216 78% 15%;
     --sidebar-accent: 216 55% 20%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 44 80% 51% / 0.2;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 216 50% 25%;
     --sidebar-ring: 44 80% 51%;
   }
 }
@@ -74,11 +74,15 @@
     height: 1px;
   }
 
-  .gold-glow {
-    box-shadow: 0 10px 15px -3px hsl(44 80% 51% / 0.3);
+  .navy-shadow {
+    box-shadow: 0 4px 14px -3px hsl(216 78% 15% / 0.25);
+  }
+
+  .card-shadow {
+    box-shadow: 0 1px 3px 0 hsl(0 0% 0% / 0.06), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
   }
 
   .gold-border-top {
-    border-top: 1px solid hsl(44 80% 51% / 0.1);
+    border-top: 3px solid hsl(44 80% 51%);
   }
 }

@@ -1,22 +1,27 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, TrendingUp, LogOut, Calculator as CalcIcon } from 'lucide-react';
+import { LogOut, Calculator as CalcIcon, ClipboardList, BarChart3, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import StatCard from '@/components/StatCard';
 import CalculatorComponent from '@/components/Calculator';
 import RequestsTable from '@/components/RequestsTable';
-import GoldDivider from '@/components/GoldDivider';
+import FinancialPanel from '@/components/FinancialPanel';
 import Footer from '@/components/Footer';
 import type { Tables } from '@/integrations/supabase/types';
+import { cn } from '@/lib/utils';
 
 type Request = Tables<'requests'>;
+
+type Tab = 'calculadora' | 'emissoes' | 'financeiro';
 
 export default function Dashboard() {
   const { user, role, signOut } = useAuth();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<Tab>('calculadora');
+
+  const isAdmin = role === 'admin';
 
   const fetchRequests = useCallback(async () => {
     setLoading(true);
@@ -30,85 +35,94 @@ export default function Dashboard() {
 
   useEffect(() => { fetchRequests(); }, [fetchRequests]);
 
-  const emitidos = requests.filter(r => r.status === 'Emitido');
-  const pendentes = requests.filter(r => r.status !== 'Emitido');
-  const comissaoReceber = emitidos.reduce((sum, r) => sum + r.comissao_imob, 0);
-  const projecaoGanho = pendentes.reduce((sum, r) => sum + r.comissao_imob, 0);
+  const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = isAdmin
+    ? [
+        { key: 'emissoes', label: 'Gestão de Pedidos', icon: <ClipboardList className="w-4 h-4" /> },
+        { key: 'financeiro', label: 'Financeiro', icon: <BarChart3 className="w-4 h-4" /> },
+      ]
+    : [
+        { key: 'calculadora', label: 'Calculadora', icon: <CalcIcon className="w-4 h-4" /> },
+        { key: 'emissoes', label: 'Controle de Emissão', icon: <ClipboardList className="w-4 h-4" /> },
+        { key: 'financeiro', label: 'Painel Financeiro', icon: <BarChart3 className="w-4 h-4" /> },
+      ];
 
-  const isAdmin = role === 'admin';
+  // Admin defaults to emissoes
+  useEffect(() => {
+    if (isAdmin && activeTab === 'calculadora') setActiveTab('emissoes');
+  }, [isAdmin, activeTab]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="border-b border-border/30 bg-card/50 backdrop-blur-md sticky top-0 z-50">
+      <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <CalcIcon className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+              <CalcIcon className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
               <h1 className="text-lg font-bold font-display tracking-tight">Imob Lucro</h1>
-              <p className="text-xs text-muted-foreground">{isAdmin ? 'Administrador Donar' : 'Painel da Imobiliária'}</p>
+              <p className="text-xs text-muted-foreground">{isAdmin ? 'Administrador Donar' : 'By Donar Corretora'}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground hidden sm:block">{user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={signOut}>
+            <Button variant="outline" size="sm" onClick={signOut}>
               <LogOut className="w-4 h-4 mr-2" /> Sair
             </Button>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-6 py-8">
-        {/* Hero Headline */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <h2 className="text-2xl font-bold font-display">
-            {isAdmin ? 'Gestão de Solicitações' : 'Transforme gestão de seguros em receita líquida.'}
-          </h2>
-        </motion.div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <StatCard
-            title="Comissão a Receber"
-            value={comissaoReceber}
-            icon={<DollarSign className="w-5 h-5" />}
-            highlight
-          />
-          <StatCard
-            title="Projeção de Ganho"
-            value={projecaoGanho}
-            icon={<TrendingUp className="w-5 h-5" />}
-          />
+      {/* Tab Navigation */}
+      <div className="border-b border-border bg-card">
+        <div className="container mx-auto px-6">
+          <nav className="flex gap-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-px',
+                  activeTab === tab.key
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </nav>
         </div>
+      </div>
 
-        <GoldDivider />
-
-        {/* Calculator (only for imobiliárias) */}
-        {!isAdmin && (
-          <div className="mb-8 max-w-xl mx-auto">
+      <main className="flex-1 container mx-auto px-6 py-8">
+        {activeTab === 'calculadora' && !isAdmin && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-2xl mx-auto">
             <CalculatorComponent />
-          </div>
+          </motion.div>
         )}
 
-        {!isAdmin && <GoldDivider />}
+        {activeTab === 'emissoes' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <h2 className="text-xl font-bold font-display mb-6">
+              {isAdmin ? 'Gestão de Todos os Pedidos' : 'Controle de Emissão'}
+            </h2>
+            {loading ? (
+              <div className="text-center py-12 text-muted-foreground">Carregando...</div>
+            ) : (
+              <RequestsTable requests={requests} isAdmin={isAdmin} onRefresh={fetchRequests} />
+            )}
+          </motion.div>
+        )}
 
-        {/* Requests Table */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-4 font-display">
-            {isAdmin ? 'Todos os Pedidos' : 'Suas Solicitações'}
-          </h3>
-          {loading ? (
-            <div className="text-center py-12 text-muted-foreground">Carregando...</div>
-          ) : (
-            <RequestsTable requests={requests} isAdmin={isAdmin} onRefresh={fetchRequests} />
-          )}
-        </div>
+        {activeTab === 'financeiro' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <h2 className="text-xl font-bold font-display mb-6">Painel Financeiro</h2>
+            <FinancialPanel requests={requests} />
+          </motion.div>
+        )}
       </main>
 
       <Footer />
