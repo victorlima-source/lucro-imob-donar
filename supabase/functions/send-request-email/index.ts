@@ -14,8 +14,13 @@ serve(async (req) => {
     const data = await req.json();
     const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
     
+    // Pega os e-mails da variável BROKER_EMAIL. 
+    // Se estiver vazio, usa os que você já tinha como reserva (fallback).
+    const brokerEmailsRaw = Deno.env.get('BROKER_EMAIL') || 'donarseguros@donarseguros.com.br, vepel1999@gmail.com';
+    const toEmails = brokerEmailsRaw.split(',').map(email => email.trim());
+
     if (!RESEND_API_KEY) {
-      console.log('RESEND_API_KEY not configured, skipping email send');
+      console.error('ERRO: RESEND_API_KEY não encontrada nas Edge Functions do Supabase');
       return new Response(JSON.stringify({ success: false, reason: 'Email not configured' }), {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -26,20 +31,11 @@ serve(async (req) => {
       <h2>Nova Solicitação de Seguro - Imob Lucro</h2>
       <h3>Dados do Imóvel</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
-        <tr><td><strong>Categoria</strong></td><td>${data.categoria_label}</td></tr>
-        <tr><td><strong>Valor do Imóvel</strong></td><td>R$ ${Number(data.valor_imovel).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td><strong>Prêmio Total</strong></td><td>R$ ${Number(data.premio_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td><strong>Valor Líquido</strong></td><td>R$ ${Number(data.valor_liquido).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td><strong>Comissão Imob</strong></td><td>R$ ${Number(data.comissao_imob).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-      </table>
-      <h3>Coberturas</h3>
-      <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
-        <tr><td>Incêndio Prédio</td><td>R$ ${Number(data.coberturas?.incendioPredio ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td>Incêndio Conteúdo</td><td>R$ ${Number(data.coberturas?.incendioConteudo ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td>Perda de Aluguel</td><td>R$ ${Number(data.coberturas?.perdaAluguel ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td>Vendaval</td><td>R$ ${Number(data.coberturas?.vendaval ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td>R. Civil</td><td>R$ ${Number(data.coberturas?.rcCivil ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
-        <tr><td>Danos Elétricos</td><td>R$ ${Number(data.coberturas?.danosEletricos ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+        <tr><td><strong>Categoria</strong></td><td>${data.categoria ?? 'N/A'}</td></tr>
+        <tr><td><strong>Valor do Imóvel</strong></td><td>R$ ${Number(data.valor_imovel ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+        <tr><td><strong>Prêmio Total</strong></td><td>R$ ${Number(data.premio_total ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+        <tr><td><strong>Valor Líquido</strong></td><td>R$ ${Number(data.valor_liquido ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+        <tr><td><strong>Comissão Imob</strong></td><td>R$ ${Number(data.comissao_imob ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
       </table>
       <h3>Dados Pessoais</h3>
       <table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;">
@@ -47,12 +43,10 @@ serve(async (req) => {
         <tr><td><strong>CPF/CNPJ</strong></td><td>${data.cpf_cnpj ?? ''}</td></tr>
         <tr><td><strong>E-mail</strong></td><td>${data.email_contato ?? ''}</td></tr>
         <tr><td><strong>Telefone</strong></td><td>${data.telefone ?? ''}</td></tr>
-        <tr><td><strong>Telefone 2</strong></td><td>${data.telefone2 ?? ''}</td></tr>
       </table>
       <h3>Endereço</h3>
-      <p>${data.rua ?? ''}, ${data.numero ?? ''} ${data.complemento ? '- ' + data.complemento : ''}<br/>
-      ${data.bairro ?? ''} - ${data.cidade ?? ''}/${data.uf ?? ''}<br/>
-      CEP: ${data.cep ?? ''}</p>
+      <p>${data.rua ?? ''}, ${data.numero ?? ''}<br/>
+      ${data.bairro ?? ''} - ${data.cidade ?? ''}/${data.uf ?? ''}</p>
     `;
 
     const res = await fetch('https://api.resend.com/emails', {
@@ -62,21 +56,21 @@ serve(async (req) => {
         'Authorization': `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: 'Imob Lucro <noreply@donarseguros.com.br>',
-        to: ['donarseguros@donarseguros.com.br', 'vepel1999@gmail.com'],
-        subject: `Nova Solicitação de Seguro - ${data.nome ?? 'Cliente'}`,
+        // IMPORTANTE: Se você não validou seu domínio no Resend, 
+        // use 'onboarding@resend.dev' aqui para testar!
+        from: 'Imob Lucro <onboarding@resend.dev>', 
+        to: toEmails, 
+        subject: `Nova Solicitação - ${data.nome ?? 'Cliente'}`,
         html: htmlBody,
       }),
     });
 
     const result = await res.json();
-    
     return new Response(JSON.stringify({ success: res.ok, result }), {
-      status: res.ok ? 200 : 500,
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error sending email:', error);
     return new Response(JSON.stringify({ success: false, error: String(error) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
